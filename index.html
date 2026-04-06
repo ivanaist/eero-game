@@ -543,29 +543,148 @@
         }
 
         function gameLoop() {
-            // Background
-            ctx.fillStyle = getBackground();
-            ctx.fillRect(0, 0, GAME_W, GAME_H);
-
-            if (dying) {
-                drawPlatforms();
-                drawFinish();
-                drawDeathAnimation();
-                drawHUD();
-            } else if (winning) {
-                drawPlatforms();
-                drawFinish();
-                drawWinAnimation();
-                drawHUD();
+            if (gameState === 'title') {
+                drawTitleScreen();
             } else {
-                update();
-                drawPlatforms();
-                drawFinish();
-                drawPlayer();
-                drawHUD();
+                // Background
+                ctx.fillStyle = getBackground();
+                ctx.fillRect(0, 0, GAME_W, GAME_H);
+
+                if (dying) {
+                    drawPlatforms();
+                    drawFinish();
+                    drawDeathAnimation();
+                    drawHUD();
+                } else if (winning) {
+                    drawPlatforms();
+                    drawFinish();
+                    drawWinAnimation();
+                    drawHUD();
+                } else {
+                    update();
+                    drawPlatforms();
+                    drawFinish();
+                    drawPlayer();
+                    drawHUD();
+                }
             }
 
             requestAnimationFrame(gameLoop);
+        }
+
+        // Game state
+        let gameState = 'title'; // 'title' or 'playing'
+        let titleTimer = 0;
+
+        // Start game when any key is pressed on title screen
+        window.addEventListener('keydown', function startGame(e) {
+            if (gameState === 'title') {
+                gameState = 'playing';
+            }
+        });
+
+        function drawTitleScreen() {
+            titleTimer++;
+
+            // Background - nice gradient sky
+            ctx.fillStyle = '#1a1a4e';
+            ctx.fillRect(0, 0, GAME_W, GAME_H);
+
+            // Stars twinkling
+            for (let i = 0; i < 50; i++) {
+                const sx = (i * 137 + 50) % GAME_W;
+                const sy = (i * 97 + 30) % (GAME_H * 0.6);
+                const twinkle = Math.sin(titleTimer * 0.05 + i) * 0.5 + 0.5;
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + twinkle + ')';
+                ctx.fillRect(sx, sy, 2, 2);
+            }
+
+            // Dancing character doing jumping jacks
+            const size = 80;
+            const jumpHeight = Math.abs(Math.sin(titleTimer * 0.08)) * 30;
+            const jackPhase = Math.sin(titleTimer * 0.15);
+            const armAngle = jackPhase * 0.8;
+            const legAngle = jackPhase * 0.5;
+
+            ctx.save();
+            ctx.translate(GAME_W / 2, GAME_H / 2 + 40 - jumpHeight);
+
+            // Body
+            ctx.fillStyle = '#4444FF';
+            ctx.fillRect(-size / 2, -size / 2, size, size);
+
+            // Happy eyes
+            ctx.fillStyle = 'white';
+            ctx.fillRect(-size * 0.3, -size * 0.2, size * 0.22, size * 0.22);
+            ctx.fillRect(size * 0.08, -size * 0.2, size * 0.22, size * 0.22);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(-size * 0.24, -size * 0.14, size * 0.12, size * 0.12);
+            ctx.fillRect(size * 0.14, -size * 0.14, size * 0.12, size * 0.12);
+
+            // Smile
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, size * 0.1, size * 0.2, 0.1, Math.PI - 0.1);
+            ctx.stroke();
+
+            // Jumping jack arms - go up and down
+            ctx.strokeStyle = '#4444FF';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(-size / 2, 0);
+            ctx.lineTo(-size / 2 - 35, -20 - armAngle * 50);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(size / 2, 0);
+            ctx.lineTo(size / 2 + 35, -20 - armAngle * 50);
+            ctx.stroke();
+
+            // Jumping jack legs - spread and close
+            ctx.beginPath();
+            ctx.moveTo(-size * 0.15, size / 2);
+            ctx.lineTo(-size * 0.2 - legAngle * 25, size / 2 + 40);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(size * 0.15, size / 2);
+            ctx.lineTo(size * 0.2 + legAngle * 25, size / 2 + 40);
+            ctx.stroke();
+
+            ctx.restore();
+
+            // Title text with rainbow effect
+            const colors = ['#FF0000', '#FF8800', '#FFFF00', '#00FF00', '#0088FF', '#8800FF'];
+            const colorIndex = Math.floor(titleTimer / 8) % colors.length;
+            ctx.fillStyle = colors[colorIndex];
+            ctx.font = 'bold 40px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText("Welcome to Eero's", GAME_W / 2, 70);
+            ctx.fillText('First Platform Game!', GAME_W / 2, 120);
+
+            // Controls box
+            const boxX = GAME_W / 2;
+            const boxY = GAME_H - 140;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(boxX - 200, boxY - 25, 400, 115);
+
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText('CONTROLS', boxX, boxY);
+            ctx.fillStyle = 'white';
+            ctx.font = '16px Arial';
+            ctx.fillText('A = Move Left    D = Move Right    Space = Jump (x2!)', boxX, boxY + 25);
+            ctx.fillText('K = Normal Character    L = Spiky Character (has shield!)', boxX, boxY + 50);
+            ctx.fillText('Reach the flag to beat each level. 50 levels total!', boxX, boxY + 75);
+
+            // Press any key prompt - blinking
+            if (Math.floor(titleTimer / 30) % 2 === 0) {
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 22px Arial';
+                ctx.fillText('Press any key to start!', GAME_W / 2, GAME_H - 15);
+            }
+
+            ctx.textAlign = 'left';
         }
 
         // Start the game
