@@ -101,6 +101,7 @@
         // On mobile, title screen gets a tall vertical canvas
         const TITLE_W = isMobileDevice ? 400 : GAME_W;
         const TITLE_H = isMobileDevice ? 700 : GAME_H;
+        let gameState = 'title';
 
         function fitCanvas() {
             if (isMobileDevice) {
@@ -676,8 +677,7 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Game state
-        let gameState = 'title'; // 'title' or 'playing'
+        // Game state (gameState declared earlier near fitCanvas)
         let titleTimer = 0;
 
         // Start game when any key is pressed on title screen
