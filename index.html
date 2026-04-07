@@ -317,6 +317,21 @@
             resetPlayer();
         }
 
+        // Cheat: press Y to jump to any level
+        window.addEventListener('keydown', function(e) {
+            if ((e.key === 'y' || e.key === 'Y') && gameState === 'playing') {
+                const input = prompt('Jump to level (1-50):');
+                const num = parseInt(input);
+                if (num >= 1 && num <= 50) {
+                    level = num;
+                    generateLevel();
+                    resetPlayer();
+                    dying = false;
+                    winning = false;
+                }
+            }
+        });
+
         function update() {
             // Movement
             if (keys['a'] || keys['A']) {
