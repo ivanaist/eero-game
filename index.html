@@ -13,6 +13,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        canvas.mobile {
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+        }
         /* Mobile touch controls */
         .touch-controls { display: none; position: fixed; z-index: 10; pointer-events: none; }
         .touch-btn {
@@ -72,13 +77,11 @@
         function fitCanvas() {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             if (isTouchDevice) {
-                // On mobile portrait: stretch to full width, controls overlay on top
+                canvas.classList.add('mobile');
+                // Full width, game at the top of the screen
                 const scale = window.innerWidth / GAME_W;
-                canvas.style.width = (GAME_W * scale) + 'px';
+                canvas.style.width = window.innerWidth + 'px';
                 canvas.style.height = (GAME_H * scale) + 'px';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.transform = 'none';
             } else {
                 const scaleX = window.innerWidth / GAME_W;
                 const scaleY = window.innerHeight / GAME_H;
