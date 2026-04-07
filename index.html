@@ -231,7 +231,9 @@
                     y = GAME_H - 70;
                 }
 
-                const hasSpike = random() < spikeChance;
+                // Never put spikes on two platforms in a row — always a safe landing
+                const prevHasSpike = platforms.length > 0 && platforms[platforms.length - 1].hasSpike;
+                const hasSpike = !prevHasSpike && random() < spikeChance;
                 platforms.push({ x, y, width, height: 15, hasSpike });
 
                 lastX = x;
